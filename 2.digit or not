@@ -1,0 +1,23 @@
+%{
+#include<stdio.h>
+%}
+DIGIT [0-9]
+%%
+{DIGIT}+ printf("The input is a digit\n");
+. printf("The input is not a digit\n");
+%%
+int main() {
+    yylex();
+    return 0;
+}
+int yywrap()
+{
+}
+OUTPUT:
+C:\Program Files (x86)\GnuWin32\bin>flex capital.l
+
+C:\Program Files (x86)\GnuWin32\bin>gcc lex.yy.c
+
+C:\Program Files (x86)\GnuWin32\bin>a.exe
+  646439
+The input is a digit
