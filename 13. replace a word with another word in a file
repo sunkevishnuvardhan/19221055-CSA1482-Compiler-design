@@ -1,0 +1,56 @@
+%{
+#include <stdio.h>
+#include <string.h>
+
+// Define the words to be replaced and the replacement words
+char old_word[100];
+char new_word[100];
+%}
+
+%%
+{old_word} {
+    // Print the replacement word
+    printf("%s", new_word);
+}
+[a-zA-Z]+ {
+    // Print the original word if it doesn't match the old_word
+    printf("%s", yytext);
+}
+.|\n {
+    // Print any other character or newline as it is
+    printf("%s", yytext);
+}
+%%
+
+int main(int argc, char **argv) {
+    if (argc != 4) {
+        fprintf(stderr, "Usage: %s <old_word> <new_word> <filename>\n", argv[0]);
+        return 1;
+    }
+
+    // Copy the old and new words from the command line arguments
+    strcpy(old_word, argv[1]);
+    strcpy(new_word, argv[2]);
+
+    // Open the input file
+    FILE *file = fopen(argv[3], "r");
+    if (!file) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    // Redirect input to the file
+    yyin = file;
+
+    // Perform lexical analysis
+    yylex();
+
+    // Close the input file
+    fclose(file);
+
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

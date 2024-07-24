@@ -1,0 +1,77 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function to perform the operations
+void perform_operation(char operator, int operand1, int operand2) {
+    switch (operator) {
+        case '+':
+            printf("%d + %d = %d\n", operand1, operand2, operand1 + operand2);
+            break;
+        case '-':
+            printf("%d - %d = %d\n", operand1, operand2, operand1 - operand2);
+            break;
+        case '*':
+            printf("%d * %d = %d\n", operand1, operand2, operand1 * operand2);
+            break;
+        case '/':
+            if (operand2 != 0) {
+                printf("%d / %d = %d\n", operand1, operand2, operand1 / operand2);
+            } else {
+                printf("Error: Division by zero\n");
+            }
+            break;
+        default:
+            printf("Unknown operator: %c\n", operator);
+    }
+}
+
+int operand1, operand2;
+char operator;
+%}
+
+%%
+[0-9]+        { yylval = atoi(yytext); return NUMBER; }
+"+"           { operator = yytext[0]; return OPERATOR; }
+"-"           { operator = yytext[0]; return OPERATOR; }
+"*"           { operator = yytext[0]; return OPERATOR; }
+"/"           { operator = yytext[0]; return OPERATOR; }
+[ \t\n]       { /* Ignore whitespace */ }
+.             { printf("Unknown character: %s\n", yytext); }
+%%
+
+int main(int argc, char **argv) {
+    printf("Enter a mathematical expression: ");
+    yylex();
+    perform_operation(operator, operand1, operand2);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
+int yylex() {
+    int token;
+    token = yylex();
+    if (token == NUMBER) {
+        operand1 = yylval;
+        token = yylex();
+        if (token == OPERATOR) {
+            token = yylex();
+            if (token == NUMBER) {
+                operand2 = yylval;
+            } else {
+                printf("Error: Expected a number\n");
+                exit(1);
+            }
+        } else {
+            printf("Error: Expected an operator\n");
+            exit(1);
+        }
+    } else {
+        printf("Error: Expected a number\n");
+        exit(1);
+    }
+    return token;
+}
